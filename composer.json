@@ -1,6 +1,6 @@
 {
     "name": "popphp/pop-web",
-    "description": "Pop Web Component for Pop PHP Framework 2",
+    "description": "Pop Web Component for Pop PHP Framework",
     "keywords": [
         "sessions",
         "cookies",
@@ -8,8 +8,7 @@
         "browser",
         "php",
         "pop",
-        "pop php",
-        "pop php 2"
+        "pop php"
     ],
     "homepage": "http://www.popphp.org/",
     "license": "New BSD",
@@ -27,5 +26,11 @@
         "psr-4": {
             "Pop\\Web\\": "src/"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
+        }
     }
+
 }
