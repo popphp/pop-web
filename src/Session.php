@@ -2,9 +2,7 @@
 /**
  * Pop PHP Framework (http://www.popphp.org/)
  *
- * @link       https://github.com/popphp/popphp
- * @category   Pop
- * @package    Pop_Web
+ * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -25,7 +23,7 @@ namespace Pop\Web;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0
  */
-class Session
+class Session implements \ArrayAccess
 {
 
     /**
@@ -149,6 +147,53 @@ class Session
     {
         $_SESSION[$name] = null;
         unset($_SESSION[$name]);
+    }
+
+    /**
+     * ArrayAccess offsetSet
+     *
+     * @param  mixed $offset
+     * @param  mixed $value
+     * @throws Exception
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->__set($offset, $value);
+    }
+
+    /**
+     * ArrayAccess offsetGet
+     *
+     * @param  mixed $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->__get($offset);
+    }
+
+    /**
+     * ArrayAccess offsetExists
+     *
+     * @param  mixed $offset
+     * @return boolean
+     */
+    public function offsetExists($offset)
+    {
+        return $this->__isset($offset);
+    }
+
+    /**
+     * ArrayAccess offsetUnset
+     *
+     * @param  mixed $offset
+     * @throws Exception
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->__unset($offset);
     }
 
 }

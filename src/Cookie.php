@@ -2,9 +2,7 @@
 /**
  * Pop PHP Framework (http://www.popphp.org/)
  *
- * @link       https://github.com/popphp/popphp
- * @category   Pop
- * @package    Pop_Web
+ * @link       https://github.com/popphp/popphp-framework
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2009-2015 NOLA Interactive, LLC. (http://www.nolainteractive.com)
  * @license    http://www.popphp.org/license     New BSD License
@@ -25,7 +23,7 @@ namespace Pop\Web;
  * @license    http://www.popphp.org/license     New BSD License
  * @version    2.0.0
  */
-class Cookie
+class Cookie implements \ArrayAccess
 {
 
     /**
@@ -89,7 +87,7 @@ class Cookie
      * @param  array $options
      * @return Cookie
      */
-    private function setOptions(array $options = [])
+    public function setOptions(array $options = [])
     {
         // Set the cookie owner's IP address and domain.
         $this->ip     = $_SERVER['REMOTE_ADDR'];
@@ -246,6 +244,25 @@ class Cookie
     }
 
     /**
+     * Set method to set the value of the $_COOKIE global variable
+     *
+     * @param  string $name
+     * @param  mixed $value
+     * @return void
+     */
+    public function __set($name, $value)
+    {
+        $options = [
+            'expire'   => $this->expire,
+            'path'     => $this->path,
+            'domain'   => $this->domain,
+            'secure'   => $this->secure,
+            'httponly' => $this->httponly
+        ];
+        $this->set($name, $value, $options);
+    }
+
+    /**
      * Get method to return the value of the $_COOKIE global variable
      *
      * @param  string $name
@@ -282,6 +299,53 @@ class Cookie
         if (isset($_COOKIE[$name])) {
             setcookie($name, $_COOKIE[$name], (time() - 3600), $this->path, $this->domain, $this->secure, $this->httponly);
         }
+    }
+
+    /**
+     * ArrayAccess offsetSet
+     *
+     * @param  mixed $offset
+     * @param  mixed $value
+     * @throws Exception
+     * @return void
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->__set($offset, $value);
+    }
+
+    /**
+     * ArrayAccess offsetGet
+     *
+     * @param  mixed $offset
+     * @return mixed
+     */
+    public function offsetGet($offset)
+    {
+        return $this->__get($offset);
+    }
+
+    /**
+     * ArrayAccess offsetExists
+     *
+     * @param  mixed $offset
+     * @return boolean
+     */
+    public function offsetExists($offset)
+    {
+        return $this->__isset($offset);
+    }
+
+    /**
+     * ArrayAccess offsetUnset
+     *
+     * @param  mixed $offset
+     * @throws Exception
+     * @return void
+     */
+    public function offsetUnset($offset)
+    {
+        $this->__unset($offset);
     }
 
 }
