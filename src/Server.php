@@ -122,7 +122,7 @@ class Server
     }
 
     /**
-     * Get software
+     * Get server software
      *
      * @return string
      */

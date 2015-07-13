@@ -4,8 +4,8 @@ pop-web
 OVERVIEW
 --------
 `pop-web` is collection of web-based tools that can be utilized by a web-based application.
-It contains core features that help to use, parse and manipulate sessions, cookies, mobile devices,
-browser data and server data.
+It contains core features that help to use, parse and manipulate sessions, cookies, mobile
+devices and browser and server data.
 
 `pop-web` is a component of the [Pop PHP Framework](http://www.popphp.org/).
 
@@ -65,3 +65,69 @@ unset($cookie->foo);
 unset($cookie['baz']);
 ```
 
+### Accessing server data
+
+```php
+$server = new Pop\Web\Server();
+
+// Linux
+echo $server->getOs();
+
+// Ubuntu
+echo $server->getDistro();
+
+// Apache
+echo $server->getServer();
+
+// 2.4
+echo $server->getServerVersion();
+```
+
+### Accessing browser data
+
+```php
+$browser = new Pop\Web\Browser();
+
+// Firefox
+echo $browser->getName();
+
+// 39.0
+echo $browser->getVersion();
+
+// Linux
+echo $browser->getPlatform();
+
+// Returns false
+if ($browser->isMsie()) {}
+```
+
+### Managing mobile requests and redirection
+
+##### Auto-detect and route
+
+```php
+$mobile = new Pop\Web\Mobile([
+    'desktop' => 'http://www.mydomain.com/',
+    'tablet'  => 'http://tablet.mydomain.com/',
+    'mobile'  => 'http://mobile.mydomain.com/'
+]);
+
+$mobile->route();
+```
+
+##### Force redirect route
+
+```php
+$mobile = new Pop\Web\Mobile([
+    'desktop' => 'http://www.mydomain.com/',
+    'tablet'  => 'http://tablet.mydomain.com/',
+    'mobile'  => 'http://mobile.mydomain.com/'
+]);
+
+// If an iPad, force redirect
+if ($mobile->isApple() && $mobile->isTablet()) {
+    $mobile->setRoute(Pop\Web\Mobile::TABLET);
+}
+
+$mobile->route();
+```
