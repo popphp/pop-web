@@ -48,8 +48,8 @@ $sess->kill();
 use Pop\Web\Cookie;
 
 $cookie = Cookie::getInstance([
-    'path'  => '/',
-    'expire => time() + 3600
+    'path'   => '/',
+    'expire' => time() + 3600
 ]);
 
 // Set cookie values
