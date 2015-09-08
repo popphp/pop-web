@@ -39,6 +39,12 @@ class Session implements \ArrayAccess
     private $sessionId = null;
 
     /**
+     * Namespace value
+     * @var string
+     */
+    private $namespace = '';
+
+    /**
      * Constructor
      *
      * Private method to instantiate the session object
@@ -51,6 +57,7 @@ class Session implements \ArrayAccess
         if (session_id() == '') {
             session_start();
             $this->sessionId = session_id();
+            $this->init();
         }
     }
 
@@ -67,6 +74,80 @@ class Session implements \ArrayAccess
         }
 
         return self::$instance;
+    }
+
+    /**
+     * Set a time-based value
+     *
+     * @param  string $key
+     * @param  mixed  $value
+     * @param  int    $expire
+     * @return Session
+     */
+    public function setTimedValue($key, $value, $expire)
+    {
+        $_SESSION[$key] = $value;
+        $_SESSION['_POP']['expirations'][$key] = time() + (int)$expire;
+        return $this;
+    }
+
+    /**
+     * Set a request-based value
+     *
+     * @param  string $key
+     * @param  mixed  $value
+     * @param  int    $hops
+     * @return Session
+     */
+    public function setRequestValue($key, $value, $hops)
+    {
+        $_SESSION[$key] = $value;
+        $_SESSION['_POP']['requests'][$key] = [
+            'current' => 0,
+            'limit'   => (int)$hops
+        ];
+        return $this;
+    }
+
+    /**
+     * Set a namespace-based value
+     *
+     * @param  string $key
+     * @param  mixed  $value
+     * @param  string $namespace
+     * @return Session
+     */
+    public function setNamespaceValue($key, $value, $namespace = null)
+    {
+        if (null !== $namespace) {
+            $this->setNamespace($namespace);
+        }
+
+        $_SESSION[$key] = $value;
+        $_SESSION['_POP']['namespaces'][$key] = $this->getNamespace();
+        return $this;
+    }
+
+    /**
+     * Set current namespace
+     *
+     * @param  string $namespace
+     * @return Session
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
+
+    /**
+     * Get current namespace
+     *
+     * @return string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
     }
 
     /**
@@ -104,6 +185,58 @@ class Session implements \ArrayAccess
     }
 
     /**
+     * Init the session
+     *
+     * @return void
+     */
+    private function init()
+    {
+        if (!isset($_SESSION['_POP'])) {
+            $_SESSION['_POP'] = [
+                'requests'    => [],
+                'expirations' => [],
+                'namespaces'  => []
+            ];
+        } else {
+            $this->checkRequests();
+            $this->checkExpirations();
+        }
+    }
+
+    /**
+     * Check the request-based session values
+     *
+     * @return void
+     */
+    private function checkRequests()
+    {
+        foreach ($_SESSION as $key => $value) {
+            if (isset($_SESSION['_POP']['requests'][$key])) {
+                $_SESSION['_POP']['requests'][$key]['current']++;
+                if ($_SESSION['_POP']['requests'][$key]['current'] > $_SESSION['_POP']['requests'][$key]['limit']) {
+                    unset($_SESSION[$key]);
+                    unset($_SESSION['_POP']['requests'][$key]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Check the time-based session values
+     *
+     * @return void
+     */
+    private function checkExpirations()
+    {
+        foreach ($_SESSION as $key => $value) {
+            if (isset($_SESSION['_POP']['expirations'][$key]) && (time() > $_SESSION['_POP']['expirations'][$key])) {
+                unset($_SESSION[$key]);
+                unset($_SESSION['_POP']['expirations'][$key]);
+            }
+        }
+    }
+
+    /**
      * Set a property in the session object that is linked to the $_SESSION global variable
      *
      * @param  string $name
@@ -123,7 +256,14 @@ class Session implements \ArrayAccess
      */
     public function __get($name)
     {
-        return (isset($_SESSION[$name])) ? $_SESSION[$name] : null;
+        $value = null;
+        if (isset($_SESSION[$name])) {
+            if ((!isset($_SESSION['_POP']['namespaces'][$name])) ||
+                (isset($_SESSION['_POP']['namespaces'][$name]) && ($_SESSION['_POP']['namespaces'][$name] == $this->namespace))) {
+                $value = $_SESSION[$name];
+            }
+        }
+        return $value;
     }
 
     /**
@@ -134,7 +274,14 @@ class Session implements \ArrayAccess
      */
     public function __isset($name)
     {
-        return isset($_SESSION[$name]);
+        $result = false;
+        if (isset($_SESSION[$name])) {
+            if ((!isset($_SESSION['_POP']['namespaces'][$name])) ||
+                (isset($_SESSION['_POP']['namespaces'][$name]) && ($_SESSION['_POP']['namespaces'][$name] == $this->namespace))) {
+                $result = true;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -145,8 +292,14 @@ class Session implements \ArrayAccess
      */
     public function __unset($name)
     {
-        $_SESSION[$name] = null;
-        unset($_SESSION[$name]);
+        if (isset($_SESSION[$name])) {
+            if ((!isset($_SESSION['_POP']['namespaces'][$name])) ||
+                (isset($_SESSION['_POP']['namespaces'][$name]) && ($_SESSION['_POP']['namespaces'][$name] == $this->namespace))) {
+                $_SESSION[$name] = null;
+                unset($_SESSION[$name]);
+                unset($_SESSION['_POP']['namespaces'][$name]);
+            }
+        }
     }
 
     /**
