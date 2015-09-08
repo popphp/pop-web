@@ -42,7 +42,7 @@ unset($sess['baz']);
 $sess->kill();
 ```
 
-### Advanced sessions
+### Advanced session usage
 
 ##### Session values available based on time expiration:
 
