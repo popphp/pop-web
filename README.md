@@ -77,13 +77,13 @@ if (isset($sess->foo)) {
 ##### Session values available based on number of namespace:
 
 ```php
-use Pop\Web\Session;
+use Pop\Web\SessionNamespace;
 
-$sess = Session::getInstance();
-$sess->setNamespaceValue('foo', 'bar', __NAMESPACE__);
+$sess = new SessionNamespace(__NAMESPACE__);
+$sess->foo = 'bar'
 
 if (isset($sess->foo)) {
-    echo $sess->foo;
+    echo $sess->foo;  // Only available under the namespace passed.
 } else {
     echo 'Nope!';
 }
