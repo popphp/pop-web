@@ -42,6 +42,53 @@ unset($sess['baz']);
 $sess->kill();
 ```
 
+### Advanced sessions
+
+##### Session values available based on time expiration:
+
+```php
+use Pop\Web\Session;
+
+$sess = Session::getInstance();
+$sess->setTimedValue('foo', 'bar', 10); // # of seconds
+
+if (isset($sess->foo)) {
+    echo $sess->foo;
+} else {
+    echo 'Nope!';
+}
+```
+
+##### Session values available based on number of requests:
+
+```php
+use Pop\Web\Session;
+
+$sess = Session::getInstance();
+$sess->setRequestValue('foo', 'bar', 1); // # of requests
+
+if (isset($sess->foo)) {
+    echo $sess->foo;
+} else {
+    echo 'Nope!';
+}
+```
+
+##### Session values available based on number of namespace:
+
+```php
+use Pop\Web\Session;
+
+$sess = Session::getInstance();
+$sess->setNamespaceValue('foo', 'bar', __NAMESPACE__);
+
+if (isset($sess->foo)) {
+    echo $sess->foo;
+} else {
+    echo 'Nope!';
+}
+```
+
 ### Using cookies
 
 ```php
