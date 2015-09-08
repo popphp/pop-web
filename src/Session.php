@@ -117,14 +117,18 @@ class Session implements \ArrayAccess
      * @param  string $namespace
      * @return Session
      */
-    public function setNamespaceValue($key, $value, $namespace = null)
+    public function setNamespaceValue($key, $value, $namespace = '')
     {
-        if (null !== $namespace) {
+        if ($namespace != '') {
             $this->setNamespace($namespace);
         }
 
         $_SESSION[$key] = $value;
-        $_SESSION['_POP']['namespaces'][$key] = $this->getNamespace();
+
+        if ($this->getNamespace() != '') {
+            $_SESSION['_POP']['namespaces'][$key] = $this->getNamespace();
+        }
+
         return $this;
     }
 
