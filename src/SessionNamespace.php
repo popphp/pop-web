@@ -80,7 +80,7 @@ class SessionNamespace implements \ArrayAccess
      * @param  int    $expire
      * @return Session
      */
-    public function setTimedValue($key, $value, $expire)
+    public function setTimedValue($key, $value, $expire = 300)
     {
         $_SESSION[$this->namespace][$key] = $value;
         $_SESSION['_POP'][$this->namespace]['expirations'][$key] = time() + (int)$expire;
@@ -95,7 +95,7 @@ class SessionNamespace implements \ArrayAccess
      * @param  int    $hops
      * @return Session
      */
-    public function setRequestValue($key, $value, $hops)
+    public function setRequestValue($key, $value, $hops = 1)
     {
         $_SESSION[$this->namespace][$key] = $value;
         $_SESSION['_POP'][$this->namespace]['requests'][$key] = [
