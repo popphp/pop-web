@@ -91,7 +91,7 @@ class Cookie implements \ArrayAccess
     {
         // Set the cookie owner's IP address and domain.
         $this->ip     = $_SERVER['REMOTE_ADDR'];
-        $this->domain = $_SERVER['HTTP_HOST'];
+        $this->domain = (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_HOST']);
 
         if (isset($options['expire'])) {
             $this->expire = (int)$options['expire'];
