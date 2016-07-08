@@ -1,6 +1,16 @@
 pop-web
 =======
 
+END OF LIFE
+-----------
+The `pop-web` component v2.1.0 is now end-of-life. The session and cookie sub-components have
+been forked and pushed into their own individual repositories:
+
+* popphp/pop-session
+* popphp/pop-cookie
+
+The remaining sub-components and classes will no longer be supported.
+
 OVERVIEW
 --------
 `pop-web` is collection of web-based tools that can be utilized by a web-based application.
